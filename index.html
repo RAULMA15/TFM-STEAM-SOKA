@@ -192,8 +192,8 @@ const svg = document.getElementById('diagram');
 const panel = document.getElementById('panel');
 
 const W = 900, H = 1080;
-const steamHub = {x:440, y:98, r:108};
-const sokaHub  = {x:440, y:982, r:108};
+const steamHub = {x:440, y:98, r:80};
+const sokaHub  = {x:440, y:982, r:80};
 const circleCenter = {x:440, y:540};
 const circleRadius = 200;
 const positions = categorias.map((c,i)=>{
@@ -224,16 +224,16 @@ function drawHub(hub, color, label, sub){
   const g = el('g',{});
   const circ = el('circle',{cx:hub.x, cy:hub.y, r:hub.r, fill:color, class:'hub-circle'});
   g.appendChild(circ);
-  const t = el('text',{x:hub.x, y:hub.y-18, class:'hub-label'});
-  t.textContent = label;
+  const lines = label.split('\n');
+  const lineHeight = 34;
+  const t = el('text',{x:hub.x, y:hub.y, class:'hub-label'});
+  lines.forEach((ln, idx)=>{
+    const tspan = el('tspan',{x:hub.x, dy: idx===0 ? -((lines.length-1)*lineHeight)/2 : lineHeight});
+    tspan.textContent = ln;
+    t.appendChild(tspan);
+  });
   g.appendChild(t);
-  const fo = el('foreignObject',{x:hub.x-88, y:hub.y-4, width:176, height:74});
-  const div = document.createElementNS(xhtmlNS,'div');
-  div.setAttribute('class','hub-sub');
-  div.textContent = sub;
-  fo.appendChild(div);
-  g.appendChild(fo);
-  circ.addEventListener('click', ()=>showHub(label, sub, color));
+  circ.addEventListener('click', ()=>showHub(label.replace('\n',' '), sub, color));
   svg.appendChild(g);
 }
 
@@ -264,7 +264,7 @@ categorias.forEach((cat, i)=>{
 });
 
 drawHub(steamHub, '#4f97d1', 'STEAM', 'pensamiento crítico · proyectos · innovación');
-drawHub(sokaHub, '#d1a13f', 'Educación Soka', 'creación de valor · felicidad · revolución humana');
+drawHub(sokaHub, '#d1a13f', 'Educación\nSoka', 'creación de valor · felicidad · revolución humana');
 
 // category nodes
 categorias.forEach((cat, i)=>{
