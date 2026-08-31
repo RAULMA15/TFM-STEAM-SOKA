@@ -78,8 +78,6 @@
     <h1>Conexiones, complementariedades y tensiones entre STEAM y educación Soka</h1>
     <p>Representación visual de las diez categorías del análisis comparativo (apartado 4.3–4.4). Pulsa sobre un tema para ver cómo dialogan ambos enfoques, o sobre STEAM / Educación Soka para una visión de conjunto.</p>
     <div class="legend">
-      <span><span class="dot" style="background:var(--tension)"></span> categoría con tensión destacada</span>
-      <span><span class="dot" style="background:var(--convergencia)"></span> categoría de fuerte convergencia</span>
       <span><span class="dot" style="background:var(--steam)"></span> enfoque STEAM</span>
       <span><span class="dot" style="background:var(--soka)"></span> educación Soka</span>
     </div>
@@ -270,7 +268,7 @@ drawHub(sokaHub, '#d1a13f', 'Educación\nSoka', 'creación de valor · felicidad
 categorias.forEach((cat, i)=>{
   const p = positions[i];
   const g = el('g',{});
-  const ringColor = cat.tipo === 'tension' ? '#b0524a' : '#3f8f7c';
+  const ringColor = '#5b6472';
   const circ = el('circle',{cx:p.x, cy:p.y, r:44, stroke:ringColor, class:'node-circle', 'data-i':i});
   g.appendChild(circ);
   const num = el('text',{x:p.x, y:p.y+1, class:'node-num'});
@@ -318,15 +316,13 @@ function selectCategory(i){
     }
   });
   const cat = categorias[i];
-  const tagLabel = cat.tipo === 'tension' ? 'tensión destacada' : 'fuerte convergencia';
   panel.innerHTML = `
-    <span class="tag ${cat.tipo}">${tagLabel}</span>
     <h2>${cat.n}. ${cat.nombre}</h2>
     <div class="col2">
       <div class="view-block steam-b"><h4>Mirada STEAM</h4><p>${cat.steam}</p></div>
       <div class="view-block soka-b"><h4>Mirada Soka</h4><p>${cat.soka}</p></div>
     </div>
-    <div class="encuentro"><h4>${cat.tipo === 'tension' ? 'Dónde se tensionan' : 'Punto de encuentro'}</h4><p>${cat.encuentro}</p></div>
+    <div class="encuentro"><h4>Punto de encuentro</h4><p>${cat.encuentro}</p></div>
     <div class="aportes">
       <div class="aporte-line"><span class="arrow a1">STEAM →</span><span>${cat.aporteSteamASoka}</span></div>
       <div class="aporte-line"><span class="arrow a2">Soka →</span><span>${cat.aporteSokaASteam}</span></div>
