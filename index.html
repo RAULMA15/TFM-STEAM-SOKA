@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEAM y educación Soka — mapa de conexiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12161d;
+    --panel: #1a212b;
+    --panel-border: #2a3341;
+    --ink: #e9e5da;
+    --muted: #9aa5b5;
+    --steam: #4f97d1;
+    --steam-dim: rgba(79,151,209,0.28);
+    --soka: #d1a13f;
+    --soka-dim: rgba(209,161,63,0.28);
+    --tension: #b0524a;
+    --convergencia: #3f8f7c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;}
+  h1,h2,h3,.serif{font-family:'Source Serif 4',serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 20px 60px;}
+  header{margin-bottom:28px;border-bottom:1px solid var(--panel-border);padding-bottom:24px;}
+  header h1{font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:600;margin:0 0 10px;line-height:1.25;}
+  header p{color:var(--muted);max-width:60ch;line-height:1.6;margin:0;font-size:0.97rem;}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:0.85rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .layout{display:grid;grid-template-columns:minmax(320px,460px) 1fr;gap:28px;align-items:start;}
+  @media (max-width:860px){.layout{grid-template-columns:1fr;}}
+  .diagram-holder{position:sticky;top:20px;}
+  @media (max-width:860px){.diagram-holder{position:static;}}
+  svg{width:100%;height:auto;display:block;}
+  .node-circle{fill:var(--panel);stroke-width:2.5;cursor:pointer;transition:fill .15s, stroke-width .15s;}
+  .node-circle:hover{fill:#232c38;}
+  .node-circle.selected{fill:#28323f;stroke-width:4;}
+  .node-label{font-size:12.5px;line-height:1.3;text-align:center;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;pointer-events:none;}
+  .node-num{fill:var(--ink);font-family:'Source Serif 4',serif;font-size:17px;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:600;}
+  .hub-circle{cursor:pointer;transition:filter .15s;}
+  .hub-circle:hover{filter:brightness(1.15);}
+  .hub-label{font-family:'Source Serif 4',serif;font-weight:700;font-size:19px;fill:#0e1116;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+  .hub-sub{font-size:10.5px;text-align:center;color:var(--muted);line-height:1.35;pointer-events:none;}
+  .edge{fill:none;stroke-linecap:round;transition:stroke-opacity .15s, stroke-width .15s;}
+  .edge.dim{stroke-opacity:0.12 !important;}
+  .edge.lit{stroke-width:3;}
+  .panel{background:var(--panel);border:1px solid var(--panel-border);border-radius:6px;padding:28px 30px;min-height:420px;}
+  .panel .placeholder{color:var(--muted);line-height:1.7;font-size:0.98rem;}
+  .panel .placeholder strong{color:var(--ink);}
+  .tag{display:inline-block;font-size:0.72rem;letter-spacing:.02em;padding:3px 10px;border-radius:20px;margin-bottom:14px;border:1px solid;}
+  .tag.tension{color:var(--tension);border-color:var(--tension);background:rgba(176,82,74,0.1);}
+  .tag.convergencia{color:var(--convergencia);border-color:var(--convergencia);background:rgba(63,143,124,0.1);}
+  .panel h2{font-size:1.4rem;margin:0 0 18px;font-weight:600;}
+  .col2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+  @media (max-width:520px){.col2{grid-template-columns:1fr;}}
+  .view-block{border-radius:5px;padding:15px 16px;}
+  .view-block.steam-b{background:rgba(79,151,209,0.09);border-left:3px solid var(--steam);}
+  .view-block.soka-b{background:rgba(209,161,63,0.09);border-left:3px solid var(--soka);}
+  .view-block h4{margin:0 0 8px;font-size:0.78rem;text-transform:none;letter-spacing:.01em;color:var(--muted);font-weight:500;}
+  .view-block p{margin:0;font-size:0.93rem;line-height:1.55;}
+  .encuentro{background:#141a22;border:1px solid var(--panel-border);border-radius:5px;padding:16px 18px;margin-bottom:20px;}
+  .encuentro h4{margin:0 0 8px;font-size:0.8rem;color:var(--muted);font-weight:500;}
+  .encuentro p{margin:0;line-height:1.6;font-size:0.96rem;}
+  .aportes{display:flex;flex-direction:column;gap:10px;}
+  .aporte-line{display:flex;gap:10px;align-items:flex-start;font-size:0.92rem;line-height:1.55;}
+  .arrow{flex-shrink:0;font-family:'Source Serif 4',serif;font-weight:600;font-size:0.85rem;padding-top:1px;}
+  .arrow.a1{color:var(--steam);}
+  .arrow.a2{color:var(--soka);}
+  footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--panel-border);color:var(--muted);font-size:0.82rem;line-height:1.6;}
+  footer a{color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Conexiones, complementariedades y tensiones entre STEAM y educación Soka</h1>
+    <p>Representación visual de las diez categorías del análisis comparativo (apartado 4.3–4.4). Pulsa sobre un tema para ver cómo dialogan ambos enfoques, o sobre STEAM / Educación Soka para una visión de conjunto.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--tension)"></span> categoría con tensión destacada</span>
+      <span><span class="dot" style="background:var(--convergencia)"></span> categoría de fuerte convergencia</span>
+      <span><span class="dot" style="background:var(--steam)"></span> enfoque STEAM</span>
+      <span><span class="dot" style="background:var(--soka)"></span> educación Soka</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="diagram-holder">
+      <svg id="diagram" viewBox="0 0 640 1040" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="panel" id="panel">
+      <div class="placeholder">
+        <p><strong>Cómo leer el mapa.</strong> Cada uno de los diez temas centrales se sitúa entre los dos polos del trabajo: el enfoque <strong>STEAM</strong> (arriba) y la <strong>educación Soka</strong> (abajo). Las líneas no indican jerarquía, sino que ambos enfoques atraviesan e iluminan cada tema desde su propia tradición.</p>
+        <p>Pulsa cualquier nodo numerado para leer, lado a lado, qué aporta cada modelo, dónde se encuentran (o tensionan) y qué se llevan el uno del otro — la síntesis del apartado 4.4.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Visualización complementaria al Trabajo de Fin de Máster — apartado 4.5. Contenido basado en el análisis comparativo de las secciones 4.3 y 4.4.
+  </footer>
+</div>
+
+<script>
+const categorias = [
+  {
+    n:1, nombre:"Finalidad de la educación", tipo:"tension",
+    steam:"El pensamiento crítico, la resolución de problemas reales y la transformación son el horizonte STEAM; no se formula en términos de felicidad.",
+    soka:"Makiguchi sitúa la felicidad como meta de la vida y, por tanto, de la educación: una felicidad que integra belleza, beneficio y bien, no placer inmediato ni éxito académico.",
+    encuentro:"Ambos rechazan que el aprendizaje se agote en la utilidad para el mercado laboral y exigen que el alumnado encuentre una relación de sentido propio con lo que aprende.",
+    aporteSteamASoka:"Le da a Soka los pies en la tierra: la orientación hacia problemas reales evita que la búsqueda de sentido se quede en algo demasiado abstracto.",
+    aporteSokaASteam:"Le pregunta a STEAM algo que rara vez formula: ¿para qué, en última instancia, aprendemos?"
+  },
+  {
+    n:2, nombre:"Desarrollo integral de la persona", tipo:"tension",
+    steam:"Aparece la preocupación por lo emocional, social y metacognitivo, pero la literatura muestra que estas dimensiones reciben menos atención que la cognitiva.",
+    soka:"El desarrollo integral es el punto de partida: educar significa atender a la totalidad de la persona, su bienestar y su capacidad de crear valor.",
+    encuentro:"Los dos entienden que formar no es solo transmitir contenidos, sino atender a la persona en su totalidad — aunque en STEAM depende de una incorporación intencional que en Soka se da por supuesta.",
+    aporteSteamASoka:"Le da proyectos y dinámicas concretas donde esa mirada integral deja de ser un principio bonito y se vuelve práctica real de aula.",
+    aporteSokaASteam:"Le recuerda algo esencial: lo emocional y lo relacional no son un extra, son la base de todo aprendizaje."
+  },
+  {
+    n:3, nombre:"Creatividad", tipo:"tension",
+    steam:"Es el hilo conductor de la investigación STEAM: pensamiento divergente, resolución de problemas y automotivación — aunque la evidencia de sus efectos es aún escasa y dispersa.",
+    soka:"La creatividad es una expresión de la capacidad humana de crear valor: no basta con inventar algo nuevo, ese acto debe mejorar la propia vida y la de los demás.",
+    encuentro:"STEAM trabaja la creatividad como competencia proyectual; Soka la sitúa como una actitud vital orientada a la creación de valor: dos formas distintas de entender qué significa crear.",
+    aporteSteamASoka:"Le da a Soka el terreno donde esa creatividad puede ejercitarse de forma concreta, en vez de quedarse en una idea inspiradora sin aterrizar.",
+    aporteSokaASteam:"Le da una razón de fondo para crear: no basta con inventar algo nuevo, ese acto debe mejorar la vida propia y la de los demás."
+  },
+  {
+    n:4, nombre:"Pensamiento crítico y aprendizaje activo", tipo:"convergencia",
+    steam:"Se desarrolla metodológicamente mediante proyectos, retos y contextos reales; la evaluación atiende también al proceso y a las estrategias metacognitivas.",
+    soka:"Aporta el fundamento filosófico: pensar por uno mismo no es solo una competencia útil, es una exigencia ligada a la dignidad de quien aprende.",
+    encuentro:"Uno de los puntos de mayor convergencia entre ambos modelos, aunque lo logran desde lugares distintos: STEAM desde la práctica, Soka desde la autonomía y el propósito.",
+    aporteSteamASoka:"Le ofrece estrategias muy concretas: proyectos, retos, una evaluación centrada en el proceso.",
+    aporteSokaASteam:"Le da el porqué de fondo: pensar por uno mismo es una exigencia ligada a la dignidad de quien aprende."
+  },
+  {
+    n:5, nombre:"Rol del docente", tipo:"convergencia",
+    steam:"El docente comparte conocimientos disciplinares y colabora en co-docencia y comunidades de práctica, más que transmitir contenidos.",
+    soka:"La actitud del maestro es el factor determinante: una relación pedagógica que involucra a toda la personalidad de docente y alumnado, y que exige transformarse para acompañar de verdad.",
+    encuentro:"Ninguno de los dos modelos concibe al docente como transmisor de contenidos: en ambos, la relación es educativa antes de ser académica.",
+    aporteSteamASoka:"Le da herramientas muy concretas de formación: co-docencia, comunidades de práctica, trabajo interdisciplinar.",
+    aporteSokaASteam:"Le aporta una mirada más profunda sobre qué significa ser docente: no basta con diseñar buenos proyectos, hace falta transformarse uno mismo."
+  },
+  {
+    n:6, nombre:"Colaboración, diálogo e interdisciplinariedad", tipo:"convergencia",
+    steam:"Integra varias materias en torno a un problema real, lo que obliga a practicar la escucha de forma tangible, no solo a hablar de ella.",
+    soka:"La interdependencia no es una técnica de aula, es cómo funciona la realidad: una razón última, no solo instrumental, para colaborar.",
+    encuentro:"Ambos valoran la colaboración y el diálogo, aunque Soka le da una razón última —la interdependencia como principio de realidad— y STEAM, un terreno disciplinar concreto donde ejercitarla.",
+    aporteSteamASoka:"Le ofrece un terreno disciplinar muy concreto: integrar varias materias en torno a un problema real obliga a practicar la escucha de forma tangible.",
+    aporteSokaASteam:"Le da una razón última para colaborar: la interdependencia no es una técnica de aula, es cómo funciona la realidad."
+  },
+  {
+    n:7, nombre:"Responsabilidad social y ciudadanía global", tipo:"convergencia",
+    steam:"Se articula a través de proyectos vinculados a los Objetivos de Desarrollo Sostenible, conectados con el entorno inmediato del alumnado.",
+    soka:"La responsabilidad social es consecuencia directa de la creación de valor y de la interdependencia de toda la vida — la ciudadanía global de Ikeda.",
+    encuentro:"Ambos comparten la convicción de que la educación debe ampliar la mirada del sujeto hacia el mundo, aunque STEAM lo articule mediante proyectos y Soka lo fundamente filosóficamente.",
+    aporteSteamASoka:"Le da a Soka una vía metodológica: proyectos reales, conectados con el entorno inmediato del alumnado.",
+    aporteSokaASteam:"Le aporta a STEAM un horizonte ético que evita que los proyectos sociales o ambientales se queden en un ejercicio curricular más."
+  },
+  {
+    n:8, nombre:"Belleza y dimensión estética", tipo:"tension",
+    steam:"La 'A' de STEAM incorpora las artes, pero la literatura advierte de una instrumentalización recurrente: el arte se valora por su utilidad, no por sí mismo.",
+    soka:"La belleza es uno de los tres valores fundamentales junto al beneficio y el bien: no un elemento secundario, sino una forma esencial de creación de valor.",
+    encuentro:"El punto de máxima convergencia: instrumentalizar el arte en STEAM es tan erróneo, para ambas tradiciones, como reducir la belleza a un adorno en la vida humana.",
+    aporteSteamASoka:"Le da a Soka una forma concreta de llevar esa dimensión estética al día a día del aula, integrada con otras materias.",
+    aporteSokaASteam:"Le aporta a STEAM una defensa filosófica de la belleza como valor en sí mismo, ayudando a resolver la tensión de instrumentalizar el arte."
+  },
+  {
+    n:9, nombre:"Equidad y atención a la diversidad", tipo:"tension",
+    steam:"Se formula como condición de diseño del proyecto: accesible, contextualizado y socialmente relevante — aunque declararla no garantiza practicarla.",
+    soka:"Se fundamenta en la dignidad y singularidad irrenunciable de cada persona: la diferencia no es un problema a corregir, sino parte constitutiva de la vida común.",
+    encuentro:"Ambos entienden la equidad como una exigencia interna, no un añadido: STEAM la formula como condición de diseño; Soka la fundamenta en la dignidad de cada persona.",
+    aporteSteamASoka:"Le da herramientas metodológicas concretas: proyectos accesibles, contextualizados y adaptables a distintos entornos.",
+    aporteSokaASteam:"Le aporta un fundamento más profundo: no se trata solo de dar acceso, sino de reconocer la dignidad y singularidad de cada persona."
+  },
+  {
+    n:10, nombre:"Transformación social", tipo:"tension",
+    steam:"Confía en la innovación, la creatividad y el desarrollo de competencias como vía para responder a los problemas del presente.",
+    soka:"Ninguna transformación externa basta sin una «revolución humana» interior: cuando cambiamos nosotros, cambia el mundo.",
+    encuentro:"Comparten la aspiración transformadora, pero difieren en el mecanismo: STEAM confía en la innovación; Soka exige, además, una transformación interior previa.",
+    aporteSteamASoka:"Le da a Soka los medios prácticos para que esa transformación interior tenga efectos reales: herramientas, proyectos y competencias.",
+    aporteSokaASteam:"Le explica a STEAM por qué la innovación sola no basta: sin transformación interior, el cambio puede quedarse en la superficie."
+  }
+];
+
+const svgNS = "http://www.w3.org/2000/svg";
+const xhtmlNS = "http://www.w3.org/1999/xhtml";
+const svg = document.getElementById('diagram');
+const panel = document.getElementById('panel');
+
+const W = 640, H = 1040;
+const steamHub = {x:320, y:78};
+const sokaHub  = {x:320, y:962};
+const topY = 220, bottomY = 826;
+const positions = categorias.map((c,i)=>{
+  const y = topY + (bottomY-topY) * (i/(categorias.length-1));
+  const x = (i % 2 === 0) ? 190 : 450;
+  return {x,y};
+});
+
+function el(tag, attrs){
+  const e = document.createElementNS(svgNS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function curve(x1,y1,x2,y2){
+  const midY = (y1+y2)/2;
+  return `M ${x1} ${y1} Q ${x1} ${midY} ${(x1+x2)/2} ${midY} T ${x2} ${y2}`;
+}
+
+let selected = null;
+const edgeEls = []; // {el, catIndex}
+
+// hub gradient defs
+const defs = el('defs',{});
+svg.appendChild(defs);
+
+// hubs
+function drawHub(hub, color, label, sub){
+  const g = el('g',{});
+  const circ = el('circle',{cx:hub.x, cy:hub.y, r:58, fill:color, class:'hub-circle'});
+  g.appendChild(circ);
+  const t = el('text',{x:hub.x, y:hub.y-6, class:'hub-label'});
+  t.textContent = label;
+  g.appendChild(t);
+  const fo = el('foreignObject',{x:hub.x-70, y:hub.y+6, width:140, height:40});
+  const div = document.createElementNS(xhtmlNS,'div');
+  div.setAttribute('class','hub-sub');
+  div.textContent = sub;
+  fo.appendChild(div);
+  g.appendChild(fo);
+  circ.addEventListener('click', ()=>showHub(label, sub, color));
+  svg.appendChild(g);
+}
+
+// edges first (so nodes draw on top)
+categorias.forEach((cat, i)=>{
+  const p = positions[i];
+  const eSteam = el('path',{d:curve(p.x,p.y,steamHub.x,steamHub.y), stroke:'#4f97d1', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
+  const eSoka  = el('path',{d:curve(p.x,p.y,sokaHub.x,sokaHub.y), stroke:'#d1a13f', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
+  svg.appendChild(eSteam);
+  svg.appendChild(eSoka);
+  edgeEls.push({steam:eSteam, soka:eSoka});
+});
+
+drawHub(steamHub, '#4f97d1', 'STEAM', 'pensamiento crítico · proyectos · innovación');
+drawHub(sokaHub, '#d1a13f', 'Educación Soka', 'creación de valor · felicidad · revolución humana');
+
+// category nodes
+categorias.forEach((cat, i)=>{
+  const p = positions[i];
+  const g = el('g',{});
+  const ringColor = cat.tipo === 'tension' ? '#b0524a' : '#3f8f7c';
+  const circ = el('circle',{cx:p.x, cy:p.y, r:32, stroke:ringColor, class:'node-circle', 'data-i':i});
+  g.appendChild(circ);
+  const num = el('text',{x:p.x, y:p.y+1, class:'node-num'});
+  num.textContent = cat.n;
+  g.appendChild(num);
+  const fo = el('foreignObject',{x:p.x-95, y:p.y+40, width:190, height:64});
+  const div = document.createElementNS(xhtmlNS,'div');
+  div.setAttribute('class','node-label');
+  div.textContent = cat.nombre;
+  fo.appendChild(div);
+  g.appendChild(fo);
+  g.style.cursor = 'pointer';
+  g.addEventListener('click', ()=>selectCategory(i));
+  svg.appendChild(g);
+});
+
+function clearSelection(){
+  svg.querySelectorAll('.node-circle').forEach(c=>c.classList.remove('selected'));
+  edgeEls.forEach(pair=>{
+    pair.steam.classList.remove('dim','lit');
+    pair.soka.classList.remove('dim','lit');
+  });
+}
+
+function selectCategory(i){
+  clearSelection();
+  selected = i;
+  svg.querySelectorAll('.node-circle')[i].classList.add('selected');
+  edgeEls.forEach((pair, idx)=>{
+    if(idx === i){
+      pair.steam.classList.add('lit'); pair.steam.setAttribute('stroke-opacity',0.9);
+      pair.soka.classList.add('lit'); pair.soka.setAttribute('stroke-opacity',0.9);
+    } else {
+      pair.steam.classList.add('dim');
+      pair.soka.classList.add('dim');
+    }
+  });
+  const cat = categorias[i];
+  const tagLabel = cat.tipo === 'tension' ? 'tensión destacada' : 'fuerte convergencia';
+  panel.innerHTML = `
+    <span class="tag ${cat.tipo}">${tagLabel}</span>
+    <h2>${cat.n}. ${cat.nombre}</h2>
+    <div class="col2">
+      <div class="view-block steam-b"><h4>Mirada STEAM</h4><p>${cat.steam}</p></div>
+      <div class="view-block soka-b"><h4>Mirada Soka</h4><p>${cat.soka}</p></div>
+    </div>
+    <div class="encuentro"><h4>${cat.tipo === 'tension' ? 'Dónde se tensionan' : 'Punto de encuentro'}</h4><p>${cat.encuentro}</p></div>
+    <div class="aportes">
+      <div class="aporte-line"><span class="arrow a1">STEAM →</span><span>${cat.aporteSteamASoka}</span></div>
+      <div class="aporte-line"><span class="arrow a2">Soka →</span><span>${cat.aporteSokaASteam}</span></div>
+    </div>
+  `;
+}
+
+function showHub(label, sub, color){
+  clearSelection();
+  edgeEls.forEach(pair=>{
+    if(label === 'STEAM'){ pair.steam.setAttribute('stroke-opacity',0.85); pair.soka.classList.add('dim'); }
+    else { pair.soka.setAttribute('stroke-opacity',0.85); pair.steam.classList.add('dim'); }
+  });
+  const relacionadas = categorias.map((c,i)=>`<li>${c.n}. ${c.nombre}</li>`).join('');
+  panel.innerHTML = `
+    <h2>${label}</h2>
+    <p style="color:var(--muted);margin-top:-8px;margin-bottom:18px;">${sub}</p>
+    <div class="encuentro">
+      <h4>Las diez categorías analizadas</h4>
+      <p>Pulsa cualquier número del mapa para ver, categoría a categoría, cómo dialoga ${label} con el otro enfoque.</p>
+    </div>
+    <ol style="color:var(--ink);line-height:1.9;padding-left:20px;font-size:0.94rem;">${relacionadas}</ol>
+  `;
+}
+</script>
+</body>
+</html>
