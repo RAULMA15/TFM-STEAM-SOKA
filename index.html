@@ -36,7 +36,7 @@
   @media (max-width:1100px){.diagram-holder{position:static;}}
   svg{width:100%;height:auto;display:block;}
   .node-circle{fill:var(--panel);stroke-width:2.5;cursor:pointer;transition:fill .15s, stroke-width .15s;}
-  .node-circle:hover{fill:#232c38;}
+  .node-circle:hover{fill:#232c38;} 
   .node-circle.selected{fill:#28323f;stroke-width:4;}
   .node-label{font-size:16px;line-height:1.4;text-align:center;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;pointer-events:none;}
   .node-num{fill:var(--ink);font-family:'Source Serif 4',serif;font-size:24px;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:600;}
@@ -105,13 +105,22 @@
 <script>
 const categorias = [
   {
-    n:1, nombre:"Finalidad de la educación", tipo:"tension",
-    steam:"El pensamiento crítico, la resolución de problemas reales y la transformación son el horizonte STEAM; no se formula en términos de felicidad.",
-    soka:"Makiguchi sitúa la felicidad como meta de la vida y, por tanto, de la educación: una felicidad que integra belleza, beneficio y bien, no placer inmediato ni éxito académico.",
-    encuentro:"Ambos rechazan que el aprendizaje se agote en la utilidad para el mercado laboral y exigen que el alumnado encuentre una relación de sentido propio con lo que aprende.",
-    aporteSteamASoka:"Le da a Soka los pies en la tierra: la orientación hacia problemas reales evita que la búsqueda de sentido se quede en algo demasiado abstracto.",
-    aporteSokaASteam:"Le pregunta a STEAM algo que rara vez formula: ¿para qué, en última instancia, aprendemos?"
-  },
+  n:1,
+  nombre:"Finalidad de la educación",
+  tipo:["convergencia","tension"],
+
+  steam:"La finalidad de STEAM se orienta al desarrollo del pensamiento crítico, la creatividad y la capacidad de afrontar y transformar problemas reales. El aprendizaje debe tener sentido para el alumnado y permitirle comprender y actuar sobre el mundo.",
+
+  soka:"Soka sitúa explícitamente la felicidad como finalidad de la educación, entendida no como placer o éxito individual, sino como la capacidad de crear valor, desarrollar plenamente la propia vida y contribuir al bienestar de los demás.",
+
+  encuentro:"Ambos rechazan una educación reducida a la transmisión de contenidos o a la preparación de capital humano para el mercado laboral. Coinciden en que aprender debe tener un sentido personal y humano para quien aprende.",
+
+  tension:"La diferencia aparece al definir el horizonte último de la educación: STEAM lo sitúa principalmente en la capacidad de comprender, resolver y transformar problemas del mundo real, mientras que Soka lo formula en términos de felicidad, desarrollo humano y creación de valor.",
+
+  aporteSteamASoka:"STEAM aporta a Soka un modo concreto de traducir su búsqueda de sentido y creación de valor en acción: problemas reales, proyectos y situaciones en las que el alumnado puede intervenir sobre su entorno.",
+
+  aporteSokaASteam:"Soka amplía la pregunta de STEAM sobre qué problemas resolver planteando una cuestión previa: para qué y para quién se resuelven. Introduce así un horizonte ético y humano que vincula el aprendizaje con la felicidad propia y el bienestar de los demás."
+},
   {
     n:2, nombre:"Desarrollo integral de la persona", tipo:"tension",
     steam:"Aparece la preocupación por lo emocional, social y metacognitivo, pero la literatura muestra que estas dimensiones reciben menos atención que la cognitiva.",
