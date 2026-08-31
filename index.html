@@ -25,7 +25,7 @@
   h1,h2,h3,.serif{font-family:'Source Serif 4',serif;}
   .wrap{max-width:1180px;margin:0 auto;padding:36px 20px 60px;}
   header{margin-bottom:28px;border-bottom:1px solid var(--panel-border);padding-bottom:24px;}
-  header h1{font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:600;margin:0 0 10px;line-height:1.25;}
+  header h1{font-size:clamp(2rem,3.6vw,2.9rem);font-weight:600;margin:0 0 10px;line-height:1.25;}
   header p{color:var(--muted);max-width:60ch;line-height:1.6;margin:0;font-size:0.97rem;}
   .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:0.85rem;color:var(--muted);}
   .legend span{display:inline-flex;align-items:center;gap:7px;}
@@ -38,12 +38,12 @@
   .node-circle{fill:var(--panel);stroke-width:2.5;cursor:pointer;transition:fill .15s, stroke-width .15s;}
   .node-circle:hover{fill:#232c38;}
   .node-circle.selected{fill:#28323f;stroke-width:4;}
-  .node-label{font-size:12.5px;line-height:1.3;text-align:center;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;pointer-events:none;}
-  .node-num{fill:var(--ink);font-family:'Source Serif 4',serif;font-size:17px;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:600;}
+  .node-label{font-size:16px;line-height:1.4;text-align:center;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;pointer-events:none;}
+  .node-num{fill:var(--ink);font-family:'Source Serif 4',serif;font-size:24px;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-weight:600;}
   .hub-circle{cursor:pointer;transition:filter .15s;}
   .hub-circle:hover{filter:brightness(1.15);}
-  .hub-label{font-family:'Source Serif 4',serif;font-weight:700;font-size:19px;fill:#0e1116;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
-  .hub-sub{font-size:10.5px;text-align:center;color:var(--muted);line-height:1.35;pointer-events:none;}
+  .hub-label{font-family:'Source Serif 4',serif;font-weight:700;font-size:32px;fill:#0a0d11;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+  .hub-sub{font-size:15.5px;text-align:center;color:#101317;font-weight:500;line-height:1.4;pointer-events:none;}
   .edge{fill:none;stroke-linecap:round;transition:stroke-opacity .15s, stroke-width .15s;}
   .edge.dim{stroke-opacity:0.12 !important;}
   .edge.lit{stroke-width:3;}
@@ -88,7 +88,7 @@
 
   <div class="layout">
     <div class="diagram-holder">
-      <svg id="diagram" viewBox="0 0 640 1040" xmlns="http://www.w3.org/2000/svg"></svg>
+      <svg id="diagram" viewBox="0 0 900 1080" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     <div class="panel" id="panel">
       <div class="placeholder">
@@ -192,26 +192,27 @@ const xhtmlNS = "http://www.w3.org/1999/xhtml";
 const svg = document.getElementById('diagram');
 const panel = document.getElementById('panel');
 
-const W = 640, H = 1040;
-const steamHub = {x:320, y:78};
-const sokaHub  = {x:320, y:962};
-const topY = 220, bottomY = 826;
+const W = 900, H = 1080;
+const steamHub = {x:440, y:98, r:108};
+const sokaHub  = {x:440, y:982, r:108};
+const circleCenter = {x:440, y:540};
+const circleRadius = 200;
 const positions = categorias.map((c,i)=>{
-  const y = topY + (bottomY-topY) * (i/(categorias.length-1));
-  const x = (i % 2 === 0) ? 190 : 450;
-  return {x,y};
+  const theta = (i / categorias.length) * Math.PI * 2; // evenly spaced around a full circle
+  const x = circleCenter.x + circleRadius * Math.sin(theta);
+  const y = circleCenter.y - circleRadius * Math.cos(theta);
+  return {x, y, theta};
 });
+
+// Posición fija de la etiqueta para cada categoría (1-10), tal como se pidió:
+// 1 arriba, 6 abajo, 2-3-4-5 a la derecha, 7-8-9-10 a la izquierda.
+const sideByIndex = ['top','right','right','right','right','bottom','left','left','left','left'];
 
 function el(tag, attrs){
   const e = document.createElementNS(svgNS, tag);
   for(const k in attrs) e.setAttribute(k, attrs[k]);
   return e;
 }
-function curve(x1,y1,x2,y2){
-  const midY = (y1+y2)/2;
-  return `M ${x1} ${y1} Q ${x1} ${midY} ${(x1+x2)/2} ${midY} T ${x2} ${y2}`;
-}
-
 let selected = null;
 const edgeEls = []; // {el, catIndex}
 
@@ -222,12 +223,12 @@ svg.appendChild(defs);
 // hubs
 function drawHub(hub, color, label, sub){
   const g = el('g',{});
-  const circ = el('circle',{cx:hub.x, cy:hub.y, r:58, fill:color, class:'hub-circle'});
+  const circ = el('circle',{cx:hub.x, cy:hub.y, r:hub.r, fill:color, class:'hub-circle'});
   g.appendChild(circ);
-  const t = el('text',{x:hub.x, y:hub.y-6, class:'hub-label'});
+  const t = el('text',{x:hub.x, y:hub.y-18, class:'hub-label'});
   t.textContent = label;
   g.appendChild(t);
-  const fo = el('foreignObject',{x:hub.x-70, y:hub.y+6, width:140, height:40});
+  const fo = el('foreignObject',{x:hub.x-88, y:hub.y-4, width:176, height:74});
   const div = document.createElementNS(xhtmlNS,'div');
   div.setAttribute('class','hub-sub');
   div.textContent = sub;
@@ -237,11 +238,27 @@ function drawHub(hub, color, label, sub){
   svg.appendChild(g);
 }
 
-// edges first (so nodes draw on top)
+// Each category gets its own distinct point on the hub's edge, spread
+// out in a fan, so no two connections converge on the same pixel and
+// every line can be traced back to exactly one category.
+function hubAttach(hub, i, n){
+  const spreadDeg = 46; // how wide the fan opens, either side of straight down/up
+  const angleDeg = -spreadDeg + i * (spreadDeg*2/(n-1));
+  const facingDown = hub.y < 500; // STEAM hub (top) attaches on its underside, Soka hub (bottom) on its top
+  const rad = angleDeg * Math.PI/180;
+  return {
+    x: hub.x + hub.r * Math.sin(rad),
+    y: hub.y + (facingDown ? 1 : -1) * hub.r * Math.cos(rad)
+  };
+}
+
+// edges first (so nodes draw on top) — one straight line per category per hub
 categorias.forEach((cat, i)=>{
   const p = positions[i];
-  const eSteam = el('path',{d:curve(p.x,p.y,steamHub.x,steamHub.y), stroke:'#4f97d1', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
-  const eSoka  = el('path',{d:curve(p.x,p.y,sokaHub.x,sokaHub.y), stroke:'#d1a13f', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
+  const aSteam = hubAttach(steamHub, i, categorias.length);
+  const aSoka  = hubAttach(sokaHub, i, categorias.length);
+  const eSteam = el('line',{x1:p.x, y1:p.y, x2:aSteam.x, y2:aSteam.y, stroke:'#4f97d1', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
+  const eSoka  = el('line',{x1:p.x, y1:p.y, x2:aSoka.x, y2:aSoka.y, stroke:'#d1a13f', 'stroke-opacity':0.3, 'stroke-width':1.6, class:'edge'});
   svg.appendChild(eSteam);
   svg.appendChild(eSoka);
   edgeEls.push({steam:eSteam, soka:eSoka});
@@ -255,14 +272,23 @@ categorias.forEach((cat, i)=>{
   const p = positions[i];
   const g = el('g',{});
   const ringColor = cat.tipo === 'tension' ? '#b0524a' : '#3f8f7c';
-  const circ = el('circle',{cx:p.x, cy:p.y, r:32, stroke:ringColor, class:'node-circle', 'data-i':i});
+  const circ = el('circle',{cx:p.x, cy:p.y, r:44, stroke:ringColor, class:'node-circle', 'data-i':i});
   g.appendChild(circ);
   const num = el('text',{x:p.x, y:p.y+1, class:'node-num'});
   num.textContent = cat.n;
   g.appendChild(num);
-  const fo = el('foreignObject',{x:p.x-95, y:p.y+40, width:190, height:64});
+
+  const side = sideByIndex[i];
+  let fx, fy, fw = 210, fh = 68, align = 'center';
+  if(side === 'top'){ fx = p.x-105; fy = p.y-118; }
+  else if(side === 'bottom'){ fx = p.x-105; fy = p.y+50; }
+  else if(side === 'right'){ fx = p.x+50; fy = p.y-33; fw = 180; fh = 70; align = 'left'; }
+  else { fx = p.x-230; fy = p.y-33; fw = 180; fh = 70; align = 'right'; }
+
+  const fo = el('foreignObject',{x:fx, y:fy, width:fw, height:fh});
   const div = document.createElementNS(xhtmlNS,'div');
   div.setAttribute('class','node-label');
+  div.style.textAlign = align;
   div.textContent = cat.nombre;
   fo.appendChild(div);
   g.appendChild(fo);
